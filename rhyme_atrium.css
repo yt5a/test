@@ -1,0 +1,9 @@
+#canvasBack.input{
+  color: #fff;
+  background-color: #eb6100;
+}
+
+#canvasBack.input:hover{
+  color: #fff;
+  background: #f56500;
+}
