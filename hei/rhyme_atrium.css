@@ -1,0 +1,108 @@
+@keyframes wave {
+  100% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+@keyframes waves {
+  100% {
+    transform: translate3d(0, 10px, 0);
+  }
+}
+
+@keyframes logo_rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#title_word span{
+  display:inline-block;
+  color:red;
+  font-size:24;
+}
+
+#title_word:hover span:nth-of-type(even){
+  color:blue;
+  animation-name: wave;
+  animation-duration: .2s;
+  animation-direction: alternate;
+  animation-iteration-count: 2;
+}
+#title_word:hover span:nth-of-type(odd){
+  color:blue;
+  animation-name: waves;
+  animation-duration: .2s;
+  animation-direction: alternate;
+  animation-iteration-count: 2;
+}
+
+#title_logo{
+  width:0px;
+  border-bottom: 150px solid #43A047; /* 高さ */
+	border-right: 86.6px solid transparent; /* 左辺の長さ */
+	border-left: 86.6px solid transparent; /* 右辺の長さ */
+  transform-origin:center 65%;
+  margin: 0 auto;
+  /*animation: logo_rotate 2s linear infinite forwards;*/
+}
+#title_logo:hover{
+  animation-play-state: paused
+}
+/*option1----------------------------------------*/
+#option1{
+  position: fixed;
+  width:100%;
+  top:0;
+  left:0;
+  background-color:gray;
+}
+/*layers----------------------------------------*/
+#main {
+ width: 100%;
+ display: flex;
+}
+#layers{
+}
+.layer{
+  display: inline-block;
+  height:60px;
+  width:60px;
+  background-color:blue;
+  border-radius: 50%;
+  margin:6px;
+  border: 4px solid;
+  border-color:rgba(0,0,0,0);
+}
+
+input[type=radio]:checked +.layer{
+/*background-color:blue;*/
+border: 4px solid;
+border-color:'#000000';
+}
+
+.drag {
+    cursor: move;
+    position: absolute;
+    height:70px;
+    width:70px;
+    border-radius: 50%;
+    margin:6px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.drag_now{
+  opacity:0.5;
+}
+/*canvas----------------------------------------*/
+#canvasBack{
+  display:block;
+  text-align: center;
+}
+#canvas{
+  /*float:left;*/
+  width:550px;
+  height:550px;
+  border: solid;
+  text-align: center;
+}
