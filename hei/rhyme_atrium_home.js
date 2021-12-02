@@ -122,6 +122,19 @@ function draw_set(n){
   col.setAttribute("id","colors");
   col.setAttribute("value","#000000");
   document.getElementById('option1').appendChild(col);
+
+  var save = document.createElement("input")
+  save.setAttribute("type","button")
+  save.setAttribute("value","SAVE")
+  save.addEventListener('click', function(){
+    var can = document.getElementById("canvas");
+  	var a = document.createElement('a');
+  	a.href = canvas.toDataURL('image/jpeg', 0.85);
+  	a.download = 'download.jpg';
+  	a.click()
+  })
+  document.getElementById('option1').appendChild(save);
+
   reload(n)
 }
 //<label><input type="radio" name="layer" value=0 onchange="on_layer()" checked>レイヤー1</label>
