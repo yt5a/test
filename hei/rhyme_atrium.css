@@ -46,11 +46,6 @@
 
 #title_logo{
   width:200px;
-  /*width:0px;
-  border-bottom: 150px solid #43A047; /* 高さ */
-	/*border-right: 86.6px solid transparent; /* 左辺の長さ */
-	/*border-left: 86.6px solid transparent; /* 右辺の長さ */
-  /*transform-origin:center 65%;*/
 }
 #title_logo:hover{
   animation: logo_rotate 1s linear infinite forwards;
@@ -78,14 +73,16 @@ input[type="radio"]{
 input[type="radio"]:checked + label img{
   border-color:red;
 }
+
+.sampleForm img{
+  margin:6px;
+}
 /*layers----------------------------------------*/
 #main {
  width: 100%;
  display: flex;
 }
 
-#layers{
-}
 .layer{
   display: inline-block;
   height:60px;
@@ -97,10 +94,20 @@ input[type="radio"]:checked + label img{
   border-color:rgba(0,0,0,0);
 }
 
-input[type=radio]:checked +.layer{
+.layers[type=radio]:checked +.layer{
 /*background-color:blue;*/
-border: 4px solid;
-border-color:'#000000';
+border: 4px groove;
+/*border-color:'#00ff00';*/
+}
+
+.layer img{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width:60%;
 }
 
 .drag {

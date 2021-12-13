@@ -294,8 +294,11 @@ function layer_join(){
   var lab = document.createElement("label");
   lab.setAttribute("name",'layer_col');
   lab.setAttribute("class","layer");
-  lab.style.backgroundColor='#ff0000';
-  lab.style.color='#000000'
+  lab.style.backgroundColor='#ff7f7f';
+  lab.style.color='#ffeeee'
+  var imag = document.createElement("img");
+  imag.setAttribute("src","プラス.png");
+  lab.appendChild(imag);
   //set
   var div = document.createElement("div");
   div.appendChild(lab)
@@ -317,8 +320,11 @@ function layer_dlete(){
   var lab = document.createElement("label");
   lab.setAttribute("name",'layer_col');
   lab.setAttribute("class","layer");
-  lab.style.backgroundColor='#000000';
-  lab.style.color='#000000'
+  lab.style.backgroundColor='#afeeee';
+  lab.style.color='#afeeee'
+  var imag = document.createElement("img");
+  imag.setAttribute("src","マイナス.png");
+  lab.appendChild(imag);
   //set
   var div = document.createElement("div");
   div.appendChild(lab)

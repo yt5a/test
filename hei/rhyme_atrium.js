@@ -142,7 +142,7 @@
     for (var f = 0; f < sel_path.length; f++) {
       ctx.beginPath();
       ctx.fillStyle = sel_path[f].col;
-      ctx.globalAlpha = 0.5;
+      ctx.globalAlpha = 0.7;
       if(sel_path[f].path[0].length==2){
         for (var q = 0; q < sel_path[f].path.length; q++) {
           /*if (q==0) {ctx.moveTo(sel_path[f].path[q][0]+tri.set[0], sel_path[f].path[q][1]+tri.set[1])}
