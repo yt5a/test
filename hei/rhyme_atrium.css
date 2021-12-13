@@ -119,8 +119,8 @@ border-color:'#000000';
 }
 /*canvas----------------------------------------*/
 #canvasBack{
-  width:550px;
-  height:550px;
+  width:560px;
+  height:560px;
   display:block;
   /*text-align: center;*/
   overflow: scroll;

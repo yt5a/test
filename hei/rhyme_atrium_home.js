@@ -95,7 +95,7 @@ function draw_set(n){
   canvas_option.setAttribute("id","canvas_option");
   cav.setAttribute("id","canvas");
   document.getElementById('canvasBack').appendChild(cav)
-  document.getElementById('canvasBack').appendChild(canvas_option)
+  /*document.getElementById('canvasBack').appendChild(canvas_option)
   document.getElementById('canvasBack').onscroll = function(){
     var pix = this.scrollHeight - this.offsetHeight
     if (pix/3 <=this.scrollTop) {
@@ -103,7 +103,7 @@ function draw_set(n){
     }else if(pix/3*2 >=this.scrollTop){
       this.scrollTo(0,0);
     }
-  }
+  }*/
 
   var mode = document.createElement("input");
   mode.setAttribute("type","radio");
@@ -167,6 +167,7 @@ function draw_set(n){
   document.getElementById('option1').appendChild(save);
 
   //canvas_opthion
+  /*
   var canop = document.createElement("input")
   canop.setAttribute("type","button")
   canop.setAttribute("value","SAVE")
@@ -177,6 +178,7 @@ function draw_set(n){
     back_set[1] = ccc
   })
   document.getElementById('canvas_option').appendChild(canop);
+  */
 
   reload(n)
 }
