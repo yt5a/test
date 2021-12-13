@@ -23,6 +23,8 @@
 
   var path
 
+  var img
+
   //canvas_touch
 
   // 図形の描画
@@ -31,14 +33,10 @@
   // 初期化処理
   function reload(n) {
     document.getElementById('colors').addEventListener('input', function(){
-      if (col_set==0) {
-        back_color=this.value;
-      }else if (col_set>=1) {
-        //document.getElementsByName('layer_col').item(col_set-1).style.color=this.value
+      if (col_set>=1) {
         document.getElementsByName('layer_col').item(col_set-1).style.backgroundColor=this.value
-        col[col_set-1]=this.value;
+        sel_path[col_set-1].col=this.value;
       }
-      //col = this.value;
     });
     canvas = document.getElementById('canvas');
     //reset-----
@@ -46,32 +44,28 @@
     tri = {"get":false,"path":[0,0],"set":[0,0]}
     line = [-1,10000,[]];
     mouse_st = false
-    mouse_e = 10;
+    mouse_e = 10;//マウスの大きさ
     scale = 1;
     put_on = false
     //save
     short_save = ""
     save_path = []
     save_log = []
+
+    point = []
     //----------
-    date_set=setting()[n]
-    console.log(date_set)
-    //path = date_set[0].path;//座標データ
-    //back_path = date_set[1].path;
-    //sel_path=[date_set[0].path,date_set[1].path]
-    sel_path=date_set.map(function(v) {return v.path})
-    col=date_set.map(function(v) {return v.col})
-    //col.push(date_set[0].col)
-    //col.push(date_set[1].col)
-    //back_col = date_set[0].col;
-    //col = date_set[1].col;
-    back_color = date_set[0].bcol
+    date_set = ""
+    //setTimeout(function(){date_set=setting()},100)
+    date_set=setting()//パスデータの取得
+    date_set=date_set[n]
+
+    sel_path=date_set.map(function(v) {return {path:v.path,col:v.col} })
+    //col=date_set.map(function(v) {return v.col})
+    back_set = [date_set[0].bcol]
     line_light=1
 
-    //dog=sel_path.length-1
-    dog=0
+    dog=0//レイヤー番号
     col_set=dog+1
-    //console.log(setting(2)['path'])
 
     if(!canvas && !canvas.getContext) {
       return false;
@@ -99,90 +93,102 @@
         //mline=[]
       });
     }
-    //layers=document.getElementById('layers')
-    layer_set(col)
-    //document.getElementById('colors').value=rgbTo16(col.item(dog).style.color)
-    //color_set
-    document.getElementById('colors').value=col[dog]
+    layer_set(sel_path)//外部ファイル：レイヤーのセット
+
+    document.getElementById('colors').value=sel_path[dog].col
 
     //canvas上のイベント
     canvas_event(true)//クリック制限
-    key_event()
+    key_event()//key_,eventの設定
+    var fileReader = new FileReader() ;
+
+		fileReader.onload = function() {
+			var dataUri = this.result ;
+		}
+    img = "インターフィールド.png"
+
+    imgs = new Image();
+    imgs.src = img;// 画像のURLを指定
+    img = imgs
+    back_set.push(img)
+    /*back_set.onload = () => {
+    //ctx.drawImage(chara, 0, 0);
+  　};*/
 
     //canvas_time
-    drawtime = setInterval(drawing,20);
+    //drawtime = setInterval(drawing,20);
+    drawing()
   };
 /*------------------------------------------------------------*/
 /*------------------------------------------------------------*/
   function drawing() {
-    var len = sel_path[dog].length
-    //背景
-    ctx.fillStyle = back_color;
+    if (sel_path[dog]) {
+      var len = sel_path[dog].length
+    }
+    //reset
+    ctx.fillStyle = "white";
 		ctx.fillRect(0, 0,canvas.width, canvas.height);
-
-    //ctx.fillStyle = col[0];
-    /*
-    ctx.beginPath();
-    for (var i = 0; i < back_path.length; i++) {
-      if (i==0) {ctx.moveTo(back_path[i][0]+tri.set[0],back_path[i][1]+tri.set[1]);}
-      else{ctx.lineTo(back_path[i][0]+tri.set[0], back_path[i][1]+tri.set[1]);
-      }
-    }
-    ctx.fill();
-    */
-
-    //図形
-    /*
-    if (put_on==false) {
-      //var c = canvas.getContext('2d');
-      // 線形グラデーション
-      //var g = c.createRadialGradient(mouseX,mouseY,5,mouseX,mouseY, 65);
-      // 色を定義
-      //g.addColorStop(0, 'white');
-      //g.addColorStop(0.6, 'gray');
-      //g.addColorStop(1, 'red');
-      ctx.fillStyle = col;
+    //背景
+    if (back_set[0] instanceof HTMLElement){
+      ctx.drawImage(back_set[0],0,0);
     }else{
-      ctx.fillStyle = 'blue';
+    ctx.fillStyle = back_set[0];
+		ctx.fillRect(0, 0,canvas.width, canvas.height);
     }
-    //ctx.globalAlpha = 0.5;
-    /*
-    ctx.beginPath();
-    for (var i = 0; i < path.length; i++) {
-      if (i==0) {ctx.moveTo(path[i][0]+tri.set[0], path[i][1]+tri.set[1]);}
-      else{ctx.lineTo(path[i][0]+tri.set[0], path[i][1]+tri.set[1]);
-      }
-    }
-    ctx.fill();
-    */
+    //画像
+
     //図形
+    ctx.save();
     for (var f = 0; f < sel_path.length; f++) {
       ctx.beginPath();
-      ctx.fillStyle = col[f];
-      if(sel_path[f][0].length==2){
-        for (var q = 0; q < sel_path[f].length; q++) {
-          if (q==0) {ctx.moveTo(sel_path[f][q][0]+tri.set[0], sel_path[f][q][1]+tri.set[1])}
-          else{ctx.lineTo(sel_path[f][q][0]+tri.set[0], sel_path[f][q][1]+tri.set[1])}
+      ctx.fillStyle = sel_path[f].col;
+      ctx.globalAlpha = 0.5;
+      if(sel_path[f].path[0].length==2){
+        for (var q = 0; q < sel_path[f].path.length; q++) {
+          /*if (q==0) {ctx.moveTo(sel_path[f].path[q][0]+tri.set[0], sel_path[f].path[q][1]+tri.set[1])}
+          else{ctx.lineTo(sel_path[f].path[q][0]+tri.set[0], sel_path[f].path[q][1]+tri.set[1])}*/
+          if (f==dog) {
+            if (q==0) {ctx.moveTo(sel_path[f].path[q][0]+tri.set[0], sel_path[f].path[q][1]+tri.set[1])}
+            else{ctx.lineTo(sel_path[f].path[q][0]+tri.set[0], sel_path[f].path[q][1]+tri.set[1])}
+          }else{
+            if (q==0) {ctx.moveTo(sel_path[f].path[q][0], sel_path[f].path[q][1])}
+            else{ctx.lineTo(sel_path[f].path[q][0], sel_path[f].path[q][1])}
+          }
         }
-      }else if(sel_path[f][0].length==3){
-        ctx.arc(sel_path[f][0][0],sel_path[f][0][1],sel_path[f][0][2],0,360*Math.PI/180,false);
+      }else if(sel_path[f].path[0].length==3){
+        ctx.arc(sel_path[f].path[0][0],sel_path[f][0][1],sel_path[f].path[0][2],0,360*Math.PI/180,false);
       }
       ctx.fill();
     }
+    ctx.restore();
+    ctx.save();
     //線
     if (line_light>=1) {
       for (var i = 0; i < len; i++) {
         ctx.beginPath () ;
-        ctx.moveTo(sel_path[dog][i][0]+tri.set[0],sel_path[dog][i][1]+tri.set[1]);
-        ctx.lineTo(sel_path[dog][(i+1)%len][0]+tri.set[0],sel_path[dog][(i+1)%len][1]+tri.set[1])
+        ctx.moveTo(sel_path[dog].path[i][0]+tri.set[0],sel_path[dog].path[i][1]+tri.set[1]);
+        ctx.lineTo(sel_path[dog].path[(i+1)%len][0]+tri.set[0],sel_path[dog].path[(i+1)%len][1]+tri.set[1])
         ctx.strokeStyle = "black";
-        //context.lineWidth = 10 ;
         ctx.stroke() ;
       }
     }
 
-    //design
-    design()
+    //マウスアクション
+    //var mouse_p = design()
+    for (var i = 0; i < point.length; i++) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(point[i].x,point[i].y,point[i].size,0 * Math.PI/180,
+         360*Math.PI/180,false);
+      ctx.fillStyle = point[i].col;
+      ctx.globalAlpha = 0.5;
+      ctx.fill();
+      ctx.strokeStyle = point[i].line;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+      ctx.save();
+    }
 
     //mouse_pointer
     if (mouse_st == true) {
@@ -193,52 +199,40 @@
       ctx.fillStyle = "white";
       ctx.globalAlpha = 0.5;
       ctx.fill();
+      ctx.strokeStyle = '#000000'
+      ctx.stroke();
       ctx.restore();
       ctx.save();
     }
+
+    setTimeout(drawing,30);
   };
 
+
+
   function design() {
+    point = []
+
     if (ons==true) {
       for (key in pap) {
-        sel_path[dog][key][0]=mouseX+pap[key][0]
-        sel_path[dog][key][1]=mouseY+pap[key][1]
+        sel_path[dog].path[key][0]=mouseX+pap[key][0]
+        sel_path[dog].path[key][1]=mouseY+pap[key][1]
       }
     }else{
-
       if (line[0]>=0) {
-        var paps={}
-        for (var i = 0; i < sel_path[dog].length; i++) {
-          var xx=(sel_path[dog][i][0]+tri.set[0]-mouseX)**2+(sel_path[dog][i][1]+tri.set[1]-mouseY)**2
+        paps={}
+        for (var i = 0; i < sel_path[dog].path.length; i++) {
+          var xx=(sel_path[dog].path[i][0]+tri.set[0]-mouseX)**2+(sel_path[dog].path[i][1]+tri.set[1]-mouseY)**2
           if (mouse_e**2>=xx) {
-            paps[i]=[sel_path[dog][i][0]+tri.set[0]-mouseX,sel_path[dog][i][1]+tri.set[1]-mouseY]
+            paps[i]=[sel_path[dog].path[i][0]+tri.set[0]-mouseX,sel_path[dog].path[i][1]+tri.set[1]-mouseY]
           }
         }
+
         if (!Object.keys(paps).length&&line[1]<=mouse_e+2) {//垂線交点が存在する。垂線がマウスの範囲にある
-          ctx.save();
-          ctx.beginPath();
-          ctx.fillStyle = "blue";
-          ctx.arc(line[2][0]+tri.set[0],line[2][1]+tri.set[1],5,0,
-             360*Math.PI/180,false);
-          ctx.fill();
-          ctx.strokeStyle = "red";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.restore();
-          ctx.save();
+          point.push({x:line[2][0]+tri.set[0],y:line[2][1]+tri.set[1],size:5,col:'blue',line:'red'})
         }else{
           for (key in paps) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(mouseX+paps[key][0],mouseY+paps[key][1],5,0,
-               360*Math.PI/180,false);
-            ctx.fillStyle = "red";
-            ctx.fill();
-            ctx.strokeStyle = "blue";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.restore();
-            ctx.save();
+            point.push({x:mouseX+paps[key][0],y:mouseY+paps[key][1],size:5,col:'red',line:'blue'})
           }
         }
       }
@@ -253,24 +247,15 @@ function key_event(){
     }
     var c = 0
     var l =[]
-    for (var i = 0; i < sel_path[dog].length; i++) {
-      var a = Math.round(sel_path[dog][i][0]/(scale*10)*10)
-      var b = Math.round(sel_path[dog][i][1]/(scale*10)*10)
+    for (var i = 0; i < sel_path[dog].path.length; i++) {
+      var a = Math.round(sel_path[dog].path[i][0]/(scale*10)*10)
+      var b = Math.round(sel_path[dog].path[i][1]/(scale*10)*10)
       l.push([a,b])
     }
     ori = l
 
-    if (event.key=="ArrowUp") {
-      scale=(scale*10+1)/10
-      c = 1
-    }else if (event.key=="ArrowDown") {
-      if (scale*10>=2) {
-        scale=(scale*10-1)/10
-        c = -1
-      }
-    }
     scale=Math.floor(scale*10)/10
-    sel_path[dog]=path_scale(ori,scale,c)
+    sel_path[dog].path=path_scale(ori,scale,c)
 
     if (tri.get==true && ons==false) {//縮尺座標調整
       tri.set=[mouseX -tri.path[0],mouseY -tri.path[1]]
@@ -280,7 +265,9 @@ function key_event(){
     }else if (event.key=="ArrowRight") {
       nexts()
     }
-    line_get()//マウスより最寄りの辺を取得
+    if (sel_path[0]) {
+      line_get()//マウスより最寄りの辺を取得
+    }
   });
 }
 
@@ -293,16 +280,30 @@ function stop(){
 
 function backs(){
   if (save_path.length>=1) {
-    save_log.push(sel_path)
-    sel_path=save_path[save_path.length-1]
+    save_log.push({path:sel_path,layer:document.getElementById("layers").innerHTML,dog:dog})
+
+    sel_path=save_path[save_path.length-1].path
+    document.getElementById("layers").innerHTML = save_path[save_path.length-1].layer
+    dog = save_path[save_path.length-1].dog
+    for (var i = 0; i < document.getElementById("layers").children.length; i++) {
+      layer_event(document.getElementById("layers").children[i])
+    }
+
     save_path.pop()
   }
 }
-
+//save_log.layer.push(document.getElementById("layers").innerHTML)
 function nexts(){
   if (save_log.length>=1) {
-    save_path.push(sel_path)
-    sel_path=save_log[save_log.length-1]
+    save_path.push({path:sel_path,layer:document.getElementById("layers").innerHTML,dog:dog})
+
+    sel_path=save_log[save_log.length-1].path
+    document.getElementById("layers").innerHTML = save_log[save_log.length-1].layer
+    dog = save_log[save_log.length-1].dog
+    for (var i = 0; i < document.getElementById("layers").children.length; i++) {
+      layer_event(document.getElementById("layers").children[i])
+    }
+
     save_log.pop()
   }
 }
@@ -335,52 +336,76 @@ function on_layer(){
     mouse_st = true
 
     var rect = e.target.getBoundingClientRect();
+    //console.log("x",e.clientX,rect.left)
+    //console.log("y",e.clientY,rect.top)
     mouseX = Math.floor(e.clientX - rect.left);
     mouseY = Math.floor(e.clientY - rect.top);
     if (tri.get==true && ons==false) {//縮尺座標調整
-      tri.set=[mouseX -tri.path[0],mouseY -tri.path[1]]
+      tri.set=[mouseX - tri.path[0],mouseY - tri.path[1]]
     }
-    line_get()//マウスより最寄りの辺を取得
+    if (sel_path[0]) {
+      line_get()//マウスより最寄りの辺を取得
+    }
+    design()
     //slider_change()
     /*put_on=inner_get()*/
   };
   function mouse_out(e) {
     mouse_st = false
     tri.get=false
+    if (tri.set.every(v => Math.abs(v)>=1)) {
+      save_path.push(short_save)
+      save_log = []
+      for (var q = 0; q < sel_path[dog].path.length; q++) {
+        var dso = sel_path[dog].path[q]
+        sel_path[dog].path[q] = [dso[0]+tri.set[0],dso[1]+tri.set[1]]
+      }
+      tri.set = [0,0]
+    }
     tri.path=[mouseX,mouseY]
   };
 
   function click_event(e) {
     if (tri.get==true) {
       tri.get=false
-      tri.path=[mouseX,mouseY]
+      //tri.path=[mouseX,mouseY]
+      if (tri.set.every(v => Math.abs(v)>=1)) {
+        save_path.push(short_save)
+        save_log = []
+      }
+      for (var q = 0; q < sel_path[dog].path.length; q++) {
+        var dso = sel_path[dog].path[q]
+        sel_path[dog].path[q] = [dso[0]+tri.set[0],dso[1]+tri.set[1]]
+      }
+      tri.set=[0,0]
     }
   }
 
 
   function down_event(){
-    var get = document.getElementById('option1').children
-    if (get[0].firstChild.checked){
+    //var get = document.getElementById('option1').children
+    var get = document.getElementsByName('mode')
+    if (get[0].checked){
       down_edit()
-    }else if(get[1].firstChild.checked){
+    }else if(get[1].checked){
       down_eraser()
-    }else if(get[2].firstChild.checked){
+    }else if(get[2].checked){
       down_move()
     }
   }
 
   function down_edit(){
     pap = {};
-    if (ons==false){
-      for (var i = 0; i < sel_path[dog].length; i++) {
-        var xx=(sel_path[dog][i][0]-mouseX+tri.set[0])**2+(sel_path[dog][i][1]-mouseY+tri.set[1])**2
+    if (ons==false && sel_path[0]){
+      for (var i = 0; i < sel_path[dog].path.length; i++) {
+        var xx=(sel_path[dog].path[i][0]-mouseX+tri.set[0])**2+(sel_path[dog].path[i][1]-mouseY+tri.set[1])**2
         if (mouse_e**2>=xx) {
           ons = true
 
           short_save = gets_path()
           save_log = []
 
-          pap[i]=[sel_path[dog][i][0]- mouseX,sel_path[dog][i][1]- mouseY]
+          pap[i]=[sel_path[dog].path[i][0]- mouseX,sel_path[dog].path[i][1]- mouseY]
         }
       }
 
@@ -391,89 +416,69 @@ function on_layer(){
         save_log = []
 
         var id = line[0]+1
-        sel_path[dog].splice(id,0,line[2]);
-        pap[id]=[sel_path[dog][id][0]- mouseX,sel_path[dog][id][1]- mouseY]
+        sel_path[dog].path.splice(id,0,line[2]);
+        pap[id]=[sel_path[dog].path[id][0]- mouseX,sel_path[dog].path[id][1]- mouseY]
       }
 
-      if (ons==false) {//判定が無い
+      if (ons==false) {//判定が無い//図形移動
         tri.get=true
         tri.path=[mouseX-tri.set[0],mouseY-tri.set[1]]
+        short_save = gets_path()
       }
 
       //----------color
+      /*
       var result = sel_path.map(function( value ) {
           return inner_get(value);
       });
+
       if (result.some(function(val){return val == true})==true) {
         /*
         var v = result.lastIndexOf(true)
         col_set=v+1
         document.getElementById('colors').value=col[v]
-        */
+
       }else{
         col_set=0
         document.getElementById('colors').value=back_color
-      };
-      //----------
-      /*
-      if (inner_get(sel_path[dog])==true){
-        col_set=2
-        document.getElementById('colors').value=col[1]
-      }else if (inner_get(back_path)==true){
-        col_set=1
-        document.getElementById('colors').value=col[0]
-      }else{
-        col_set=0
-        document.getElementById('colors').value=back_color
-      }
-      */
+      }*/
     }else if(ons==true){
       ons=false
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       save_path.push(short_save)
-      sel_path[dog]=path_set(sel_path[dog])
+      sel_path[dog].path=path_set(sel_path[dog].path)
     }
   }
 
   //パスの削除
   function down_eraser(){
-    console.log(sel_path)
-    save_path.push(gets_path())
-    for (var i = 0; i < sel_path[dog].length; i++) {
-      var xx=(sel_path[dog][i][0]-mouseX+tri.set[0])**2+(sel_path[dog][i][1]-mouseY+tri.set[1])**2
+    short_save = gets_path()
+    for (var i = 0; i < sel_path[dog].path.length; i++) {
+      var xx=(sel_path[dog].path[i][0]-mouseX+tri.set[0])**2+(sel_path[dog].path[i][1]-mouseY+tri.set[1])**2
       xx = Math.round(xx)
       if (mouse_e**2>=xx){
+        save_path.push(short_save)
         save_log = []
-        sel_path[dog][i]=undefined
+        sel_path[dog].path[i]=undefined
       }
     }
-    console.log(tri.set)
-    console.log(sel_path[dog])
-    sel_path[dog]=sel_path[dog].filter(Boolean);
-    tri.get=true;
-    console.log(tri.path)
-    tri.path=[mouseX-tri.set[0],mouseY-tri.set[1]];
+    if (sel_path[dog].path.includes(undefined)) {
+      sel_path[dog].path=sel_path[dog].path.filter(Boolean);
+    }else{
+      tri.get=true
+      tri.path=[mouseX-tri.set[0],mouseY-tri.set[1]]
+      short_save = gets_path()
+    }
+    /*
+    if (ons==false) {//判定が無い//図形移動
+    }*/
   }
 
   function down_move(){
     pap = {};
     if (ons==false){
-      /*
-      for (var i = 0; i < mline.length; i++) {
-        var xx=(mline[i][0][0]-mouseX+tri.set[0])**2+(mline[i][0][1]-mouseY+tri.set[1])**2
-        if (mouse_e**2>=xx) {
-          ons = true
-
-          pap[i]=[]
-          for (var ii = 0; ii < mline[i].length; ii++) {
-            pap[i].push([mline[i][ii][0]- mouseX,mline[i][ii][1]- mouseY])
-          }
-        }
-      }*/
-      if (ons==false) {
-        tri.get=true
-        tri.path=[mouseX-tri.set[0],mouseY-tri.set[1]]
-      }
+      tri.get=true
+      tri.path=[mouseX-tri.set[0],mouseY-tri.set[1]]
     }else{
       ons=false
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -485,8 +490,8 @@ function on_layer(){
 /*------------------------------------------------------------*/
   function line_get(){//最寄りの線
     line = [-1,10000,[]];
-    var len = sel_path[dog].length;
-    var path = sel_path[dog]
+    var len = sel_path[dog].path.length;
+    var path = sel_path[dog].path
 
     for (var i = 0; i < len; i++) {
       //点A,Bの間の角度
@@ -593,33 +598,28 @@ function on_layer(){
   //window.setTimeout(function(){reload()},10)
   //window.addEventListener('load',reload, false);
 /*------------------------------------------------------------*/
-
-//js_gif
-/*function get_path(){
-  var get = []
-  for (var i = 0; i < sel_path[dog].length; i++) {
-    get.push([sel_path[dog][i][0],sel_path[dog][i][1]])
-  }
-  return get
-}*/
 function gets_path(){
   var gets = []
   var get = []
   for (var i = 0; i < sel_path.length; i++) {
     get = []
-    for (var ii = 0; ii < sel_path[i].length; ii++) {
-      get.push([sel_path[i][ii][0],sel_path[i][ii][1]])
+    for (var ii = 0; ii < sel_path[i].path.length; ii++) {
+      get.push([sel_path[i].path[ii][0],sel_path[i].path[ii][1]])
     }
-    gets.push(get)
+    gets.push({path:get,col:sel_path[i].col})
   }
-  return gets
+  //console.log({path:gets,layer:document.getElementById("layers").innerHTML,dog:dog})
+  return {path:gets,layer:document.getElementById("layers").innerHTML,dog:dog}
 }
 
-function layer_shuffle(a,b){
+function layer_shuffle(a,b){//レイヤー:前：後
   var layer = document.getElementById("layers")
 
   var el_a = layer.children[a].innerHTML
   var el_b = layer.children[b].innerHTML
+
+  save_path.push(gets_path())
+  save_log = []
 
   layer.children[a].innerHTML=el_b
   layer.children[b].innerHTML=el_a
@@ -632,9 +632,31 @@ function layer_shuffle(a,b){
   var el = sel_path[a]
   sel_path[a] = sel_path[b]
   sel_path[b] = el
-  var co = col[a]
-  col[a] = col[b]
-  col[b] = co
 
   dog = b
+}
+
+function layer_pop(n){
+
+  var layer = document.getElementById("layers")
+  for (var i = 0; i < layer.children.length; i++) {
+    layer.children[i].children[0].value=i
+  }
+  sel_path.splice(n,1)
+  if (sel_path.length==0) {
+    sel_path=[]
+  }
+  dog=0
+}
+
+function layer_push(){
+
+  var layer = document.getElementById("layers")
+  for (var i = 0; i < layer.children.length; i++) {
+    layer.children[i].children[0].value=i
+  }
+  sel_path.push({path:[[200,200],[400,200],[400,400],[200,400]],col:document.getElementById('colors').value})
+  //{path:[[200,200],[400,200],[400,400],[200,400]],col:'#ff0000',bcol:"#808080"}
+  dog=sel_path.length-1
+  col_set=sel_path.length
 }

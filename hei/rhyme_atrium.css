@@ -10,15 +10,23 @@
 }
 
 @keyframes logo_rotate {
-  100% {
-    transform: rotate(360deg);
+  30% {
+    /*transform: rotate(360deg);*/
+    transform: scale(1.05, 1.05);
   }
 }
 
+#title{
+  margin:0 auto;
+  margin-top:10%;
+}
+
+#title_word{text-align:center;}
 #title_word span{
   display:inline-block;
   color:red;
   font-size:24;
+  text-align: center;
 }
 
 #title_word:hover span:nth-of-type(even){
@@ -37,30 +45,45 @@
 }
 
 #title_logo{
-  width:0px;
+  width:200px;
+  /*width:0px;
   border-bottom: 150px solid #43A047; /* 高さ */
-	border-right: 86.6px solid transparent; /* 左辺の長さ */
-	border-left: 86.6px solid transparent; /* 右辺の長さ */
-  transform-origin:center 65%;
-  margin: 0 auto;
-  /*animation: logo_rotate 2s linear infinite forwards;*/
+	/*border-right: 86.6px solid transparent; /* 左辺の長さ */
+	/*border-left: 86.6px solid transparent; /* 右辺の長さ */
+  /*transform-origin:center 65%;*/
 }
 #title_logo:hover{
-  animation-play-state: paused
+  animation: logo_rotate 1s linear infinite forwards;
 }
 /*option1----------------------------------------*/
 #option1{
-  position: fixed;
+  /*position: fixed;*/
   width:100%;
   top:0;
   left:0;
   background-color:gray;
+}
+
+.mode img{
+  height:30px;
+  margin:2px;
+  border:1px solid;
+  background-color:#dcdcdc;
+}
+
+input[type="radio"]{
+  display: none;
+}
+
+input[type="radio"]:checked + label img{
+  border-color:red;
 }
 /*layers----------------------------------------*/
 #main {
  width: 100%;
  display: flex;
 }
+
 #layers{
 }
 .layer{
@@ -96,13 +119,21 @@ border-color:'#000000';
 }
 /*canvas----------------------------------------*/
 #canvasBack{
+  width:550px;
+  height:550px;
   display:block;
-  text-align: center;
+  /*text-align: center;*/
+  overflow: scroll;
 }
 #canvas{
   /*float:left;*/
   width:550px;
   height:550px;
-  border: solid;
+  border:solid;
   text-align: center;
+}
+
+#canvas_option{
+  height:50px;
+  background-color:lightblue;
 }

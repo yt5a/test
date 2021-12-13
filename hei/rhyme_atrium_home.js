@@ -3,7 +3,8 @@ num = 0
 
 
 //title_logo
-var title_text="RHYME ATRIUM(in blank_shape)"
+//var title_text="RHYME ATRIUM(in blank_shape)"
+var title_text="Blank Shape"
 console.log(document.getElementById('title_word'))
 for (const i in title_text){
   console.log(title_text.length)
@@ -15,9 +16,6 @@ for (const i in title_text){
 document.getElementById("title_logo").setAttribute("onclick","select_set()");
 
 });
-
-//<label><input type="radio" name="mode" value="0" checked>編集</label>
-//<label><input type="radio" name="mode" value="1">消しゴム</label>
 function select_set(){
   document.getElementById('main').innerHTML = ""
   //<input type="button" class="select" value="1Click" onclick="draw_set(0)"><br>
@@ -77,32 +75,65 @@ function draw_set(n){
   main.innerHTML=""
   document.getElementById('option1').innerHTML = ""
   //<div id='layers'>
+  var left_opt = document.createElement("div");
   var lay_set = document.createElement("div");
+  var indent = document.createElement("div");
   var canva = document.createElement("div");
+  indent.setAttribute("style","position:fixed;bottom:0;");
   lay_set.setAttribute("id","layers");
   canva.setAttribute("id","canvasBack");
-  main.appendChild(lay_set);
+  left_opt.setAttribute("id","left_option");
+  indent.setAttribute("id","indent");
+  left_opt.appendChild(lay_set);
+  left_opt.appendChild(indent);
+  main.appendChild(left_opt);
   main.appendChild(canva);
 
-  document.getElementById('canvasBack').innerHTML="<canvas id='canvas'></canvas>";
-  //<input id="mouse_slide" type="range" name="range-1" value="0" min="1" max="100" step="1">
-  var lab = document.createElement("label");
+  //camvas
+  var canvas_option = document.createElement("div");
+  var cav = document.createElement("canvas");
+  canvas_option.setAttribute("id","canvas_option");
+  cav.setAttribute("id","canvas");
+  document.getElementById('canvasBack').appendChild(cav)
+  document.getElementById('canvasBack').appendChild(canvas_option)
+  document.getElementById('canvasBack').onscroll = function(){
+    var pix = this.scrollHeight - this.offsetHeight
+    if (pix/3 <=this.scrollTop) {
+      this.scrollBy(0,pix);
+    }else if(pix/3*2 >=this.scrollTop){
+      this.scrollTo(0,0);
+    }
+  }
+
   var mode = document.createElement("input");
   mode.setAttribute("type","radio");
   mode.setAttribute("name","mode");
+  mode.setAttribute("id","mode_0");
   mode.setAttribute("value","0");
   mode.setAttribute("checked","");
+  var lab = document.createElement("label");
+  lab.setAttribute("for","mode_0");
+  lab.setAttribute("class","mode");
+  var imag = document.createElement("img");
+  imag.setAttribute("src","マイ鉛筆.png");
+  lab.appendChild(imag);
   //mode.textContent="編集"
-  lab.appendChild(mode)
+  document.getElementById('option1').appendChild(mode);
   document.getElementById('option1').appendChild(lab);
 
-  lab = document.createElement("label");
   mode = document.createElement("input");
   mode.setAttribute("type","radio");
   mode.setAttribute("name","mode");
+  mode.setAttribute("id","mode_1");
   mode.setAttribute("value","1");
+  lab = document.createElement("label");
+  lab.setAttribute("for","mode_1");
+  lab.setAttribute("class","mode");
+  var imag = document.createElement("img");
+  imag.setAttribute("src","マイ消しゴム.png");
+  lab.appendChild(imag);
   //mode.textContent="消しゴム"
-  lab.appendChild(mode)
+  document.getElementById('option1').appendChild(mode);
   document.getElementById('option1').appendChild(lab);
   //-----
   //var sli = Object.assign(document.createElement("input"),{
@@ -112,7 +143,7 @@ function draw_set(n){
   sli.setAttribute("name","range-1");
   sli.setAttribute("value","0");
   sli.setAttribute("min","10");
-  sli.setAttribute("max","100");
+  sli.setAttribute("max","50");
   sli.setAttribute("step","1");
   sli.addEventListener("input",mouse_sizes);
   document.getElementById('option1').appendChild(sli);
@@ -135,89 +166,180 @@ function draw_set(n){
   })
   document.getElementById('option1').appendChild(save);
 
+  //canvas_opthion
+  var canop = document.createElement("input")
+  canop.setAttribute("type","button")
+  canop.setAttribute("value","SAVE")
+  canop.addEventListener('click', function(){
+    this.value = Math.random().toString(32).substring(2)
+    var ccc = back_set[0]
+    back_set[0] = back_set[1]
+    back_set[1] = ccc
+  })
+  document.getElementById('canvas_option').appendChild(canop);
+
   reload(n)
 }
 //<label><input type="radio" name="layer" value=0 onchange="on_layer()" checked>レイヤー1</label>
 //<label><input type="radio" name="layer" value=1 onchange="on_layer()" >レイヤー2</label>
+function layer_event(div){
+  div.addEventListener('mousedown',function(){
+    var id=this.parentElement.getAttribute('id')
+    var pac=this.parentElement.children//
+    var bnum = num
+    num = [].slice.call(pac).indexOf(this)
+
+    //ホールド状態かどうか
+    var clas=document.getElementsByClassName('drag')
+    if (clas.length>=1) {
+      //document.getElementById("delete_layer").remove()
+      for (var i = 0; i < clas.length; i++) {
+        clas.item(i).remove()
+      }
+      var opa_class =document.getElementsByClassName('drag_now')
+      for (var ii = 0; ii < opa_class.length; ii++) {
+        opa_class.item(ii).classList.remove("drag_now");
+      }
+      document.body.removeAttribute("mousemove");
+      layer_shuffle(bnum,num)
+      layer_join()
+    }else{//ホールド状態では無い場合
+
+    //一定時間長押し
+    this.value=setTimeout(function(){
+      layer_dlete()
+      var get = document.getElementById(id).children[num]
+      c=get.children[1].cloneNode(true)
+      c.setAttribute('class','drag');
+      c.removeAttribute("mousedown");
+      c.removeAttribute('value');
+      document.getElementById('left_option').appendChild(c);
+      //マウスに追従
+      document.body.addEventListener("mousemove",function(e){
+        var clas=document.getElementsByClassName("drag")
+        if (clas.length>=1) {
+          for (var i = 1; i < clas.length; i++) {
+            clas.item(i).remove()
+          }
+          drag = document.getElementsByClassName("drag")[0];
+          drag.style.top = e.clientY - 30 + "px";
+        }
+      }, false);
+      //長押しされたレイヤーのCSS
+      get.classList.add("drag_now");
+      },1000)//10秒間
+    }
+  },false);
+
+  //一定時間内にボタンを離した場合
+  div.addEventListener('click',function(){
+    clearInterval(this.value);
+  });
+  //一定時間内にボタンからカーソルを外した場合
+  div.addEventListener('mouseleave',function(){
+    clearInterval(this.value);
+  })
+
+  return div
+}
+
+
+function layer_sel(i){
+  var id = Math.random().toString(32).substring(2)
+
+  //input
+  var input = document.createElement("input");
+  input.setAttribute("type","radio");
+  input.setAttribute("name","layer");
+  input.setAttribute("class","layers");
+  input.setAttribute("value",i);
+  input.setAttribute("id",id);
+  //input.setAttribute("onchange","on_layer()");
+  input.setAttribute("onclick","on_layer()");
+  input.setAttribute("display","none");
+  input.setAttribute("style","display:none")
+  if (i==0) {
+    input.setAttribute("checked",true);
+  }
+  //label
+  var lab = document.createElement("label");
+  lab.setAttribute("for",id);
+  lab.setAttribute("name",'layer_col');
+  lab.setAttribute("class","layer");
+  lab.style.backgroundColor=sel_path[i].col
+  lab.style.color='#000000'
+  //set
+  var div = document.createElement("div");
+  div.appendChild(input)
+  div.appendChild(lab)
+
+  /*event*/
+  div=layer_event(div)
+
+  document.getElementById('layers').appendChild(div);
+}
+
 function layer_set(li){
   var n=li.length
-
   for (var i = 0; i < n; i++) {
-    var id = Math.random().toString(32).substring(2)
-
-    //input
-    var input = document.createElement("input");
-    input.setAttribute("type","radio");
-    input.setAttribute("name","layer");
-    input.setAttribute("class","layers");
-    input.setAttribute("value",i);
-    input.setAttribute("id",id);
-    //input.setAttribute("onchange","on_layer()");
-    input.setAttribute("onclick","on_layer()");
-    input.setAttribute("display","none");
-    input.setAttribute("style","display:none")
-    if (i==0) {
-      input.setAttribute("checked",true);
-    }
-    //label
-    var lab = document.createElement("label");
-    lab.setAttribute("for",id);
-    lab.setAttribute("name",'layer_col');
-    lab.setAttribute("class","layer");
-    lab.style.backgroundColor=col[i]
-    lab.style.color='#000000'
-    //set
-    var div = document.createElement("div");
-    div.appendChild(input)
-    div.appendChild(lab)
-
-    /*event*/
-    div.addEventListener('mousedown',function(){
-      var id=this.parentElement.getAttribute('id')
-      var pac=this.parentElement.children//
-      var bnum = num
-      num = [].slice.call(pac).indexOf(this)
-
-      //
-      var clas=document.getElementsByClassName('drag')
-      if (clas.length>=1) {
-        for (var i = 0; i < clas.length; i++) {
-          clas.item(i).remove()
-        }
-        var opa_class =document.getElementsByClassName('drag_now')
-        for (var ii = 0; ii < opa_class.length; ii++) {
-          opa_class.item(ii).classList.remove("drag_now");
-        }
-        document.body.removeAttribute("mousemove");
-        layer_shuffle(bnum,num)
-      }
-      //
-      this.value=setTimeout(function(){
-        var get = document.getElementById(id).children[num]
-          c=get.children[1].cloneNode(true)
-          c.setAttribute('class','drag');
-          c.removeAttribute("mousedown");
-          c.removeAttribute('value');
-          document.getElementById('layers').appendChild(c);
-          document.body.addEventListener("mousemove",function(e){
-            var clas=document.getElementsByClassName("drag")
-            if (clas.length>=1) {
-              for (var i = 1; i < clas.length; i++) {
-                clas.item(i).remove()
-              }
-              drag = document.getElementsByClassName("drag")[0];
-              drag.style.top = e.clientY - 30 + "px";
-            }
-        }, false);
-        get.classList.add("drag_now");
-      },1000)
-    }, false);
-    div.addEventListener('click',function(){
-      clearInterval(this.value);
-    });
-    div.addEventListener('mouseleave',function(){
-      clearInterval(this.value);
-    })
-    document.getElementById('layers').appendChild(div);
+    layer_sel(i)
   }
+  layer_join()
+}
+
+function layer_join(){
+  document.getElementById('indent').innerHTML=""
+  var lab = document.createElement("label");
+  lab.setAttribute("name",'layer_col');
+  lab.setAttribute("class","layer");
+  lab.style.backgroundColor='#ff0000';
+  lab.style.color='#000000'
+  //set
+  var div = document.createElement("div");
+  div.appendChild(lab)
+  div.addEventListener('mousedown',function(){
+    //save
+    save_path.push(gets_path())
+    save_log = []
+
+    layer_sel(0)
+    layer_push()
+    console.log(111)
+  })
+  document.getElementById('indent').appendChild(div)
+}
+
+
+function layer_dlete(){
+  document.getElementById('indent').innerHTML=""
+  var lab = document.createElement("label");
+  lab.setAttribute("name",'layer_col');
+  lab.setAttribute("class","layer");
+  lab.style.backgroundColor='#000000';
+  lab.style.color='#000000'
+  //set
+  var div = document.createElement("div");
+  div.appendChild(lab)
+  div.addEventListener('mousedown',function(){
+    //save
+    save_path.push(gets_path())
+    save_log = []
+
+    var opa_class =document.getElementsByClassName('drag_now')
+    for (var ii = 0; ii < opa_class.length; ii++) {
+      opa_class.item(ii).classList.remove("drag_now");
+    }
+    var clas=document.getElementsByClassName('drag')
+    for (var i = 0; i < clas.length; i++) {
+      clas.item(i).remove()
+    }
+    document.getElementById("layers").children[num].remove()
+
+    document.body.removeAttribute("mousemove");
+    this.remove()
+    layer_pop(num)
+    layer_join()
+  })
+
+  document.getElementById('indent').appendChild(div)
 }
