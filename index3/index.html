@@ -1,38 +1,41 @@
 <!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | Ansel</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
+<!-- saved from url=(0051)http://heiwachan.com/MudrockClickerWebGL/index.html -->
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    
+    <title>Unity WebGL Player | MudrockClicker</title>
+    <link rel="shortcut icon" href="http://heiwachan.com/MudrockClickerWebGL/TemplateData/favicon.ico">
+    <link rel="stylesheet" href="./Unity WebGL Player _ MudrockClicker_files/style.css">
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas"></canvas>
-      <div id="unity-loading-bar">
+      <canvas id="unity-canvas" width="1440" height="810" style="width: 1440px; height: 810px;"></canvas>
+      <div id="unity-loading-bar" style="display: block;">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
+          <div id="unity-progress-bar-full" style="width: 0%;"></div>
         </div>
+      </div>
+      <div id="unity-mobile-warning">
+        WebGL builds are not supported on mobile devices.
       </div>
       <div id="unity-footer">
         <div id="unity-webgl-logo"></div>
         <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">Ansel</div>
+        <div id="unity-build-title">MudrockClicker</div>
       </div>
     </div>
     <script>
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/AnselGameHeiwa2.loader.js";
+      var loaderUrl = buildUrl + "/MudrockClickerWebGL.loader.js";
       var config = {
-        dataUrl: buildUrl + "/AnselGameHeiwa2.data",
-        frameworkUrl: buildUrl + "/AnselGameHeiwa2.framework.js",
-        codeUrl: buildUrl + "/AnselGameHeiwa2.wasm",
+        dataUrl: buildUrl + "/MudrockClickerWebGL.data",
+        frameworkUrl: buildUrl + "/MudrockClickerWebGL.framework.js",
+        codeUrl: buildUrl + "/MudrockClickerWebGL.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "HeiwaCompany",
-        productName: "Ansel",
-        productVersion: "2.0",
+        productName: "MudrockClicker",
+        productVersion: "1.0",
       };
 
       var container = document.querySelector("#unity-container");
@@ -40,13 +43,27 @@
       var loadingBar = document.querySelector("#unity-loading-bar");
       var progressBarFull = document.querySelector("#unity-progress-bar-full");
       var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var mobileWarning = document.querySelector("#unity-mobile-warning");
+
+      // By default Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         container.className = "unity-mobile";
+        // Avoid draining fillrate performance on mobile devices,
+        // and default/override low DPI mode on mobile browsers.
         config.devicePixelRatio = 1;
+        mobileWarning.style.display = "block";
+        setTimeout(() => {
+          mobileWarning.style.display = "none";
+        }, 5000);
       } else {
-        canvas.style.width = "960px";
-        canvas.style.height = "540px";
+        canvas.style.width = "1440px";
+        canvas.style.height = "810px";
       }
       loadingBar.style.display = "block";
 
@@ -65,6 +82,7 @@
         });
       };
       document.body.appendChild(script);
-    </script>
-  </body>
-</html>
+    </script><script src="./Unity WebGL Player _ MudrockClicker_files/MudrockClickerWebGL.loader.js"></script>
+  
+
+<script src="./Unity WebGL Player _ MudrockClicker_files/MudrockClickerWebGL.framework.js"></script></body></html>
